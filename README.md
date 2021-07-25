@@ -1,3 +1,11 @@
+## VueJS forms and Virtual DOM Playground
+
+A little WYSIWYG Vue SPA to take and plug into your back-end of choice 🚀 
+In my case REST and PHP, vanilla PHP to keep it simple. Also works with
+Laravel or CI3+ as you would expect. 
+
+**🙃 git with it or git lost jk lol #gitFlow **
+
 ## Authors
 
 👤 **Miguel Angel Enciso Sanchez**
