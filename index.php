@@ -156,7 +156,29 @@
                     })
                 },
                 deleteMessage(id){ 
+                    if (window.confirm('Delete this record')) {
+                        var fd = new FormData()
 
+                        fd.append('id', id)
+
+                        axios({
+                            url:'delete_message.php',
+                            method:'post',
+                            data: fd
+                        })
+                        .then(res => {
+                            console.log(id)
+                            if(res.data.res == 'success'){
+                                alert('deleted successfully')
+                                app.getChatMessages();
+                            }else{
+                                alert('error')
+                            }
+                        })
+                        .catch(err => {
+                            console.log(err)
+                        })
+                    }
                 },
                 editMessage(id){
 

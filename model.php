@@ -36,5 +36,14 @@
             }
             return $data;
         }
+
+        public function delete($id){
+            $query = "DELETE FROM anon_chat WHERE id = '$id'";
+            if ($sql = $this->conn->query($query)) {
+                return true;
+            }else{
+                return; 
+            }
+        }
     }
 ?>
