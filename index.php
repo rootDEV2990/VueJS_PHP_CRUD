@@ -29,10 +29,11 @@
         </div>
         <div class="row">
             <div class="col-md-12">
+            <!-- this is to add a message--->
                 <div>
-                    <b-button id="show-btn" @click="showModal">Add Message</b-button>
+                    <b-button id="show-btn" @click="showModal('new-message-modal')">Add Message</b-button>
 
-                    <b-modal ref="my-modal" hide-footer title="pvrBEATS - Anonymous Chat" >
+                    <b-modal ref="new-message-modal" hide-footer title="pvrBEATS - Anonymous Chat" >
                         <div class="d-block text-center">
                             <h3>CREATE ANONYMOUSLY</h3>
                             <p>Post anonymously and voice your opinions without the fear of prejudice. We offers you pseudo anonymity... pvrBeats.</p>
@@ -52,7 +53,28 @@
                                 </form>
                             </div>
                         </div>
-                        <b-button class="mt-3" variant="outline danger" block @click="hideModal">DONE</b-button>
+                        <b-button class="mt-3" variant="outline danger" block @click="hideModal('new-message-modal')">DONE</b-button>
+                    </b-modal>
+                </div>
+                <!-- this is to edit a message--->
+                <div>
+                    <b-modal ref="edit-message-modal" hide-footer title="Edit Message">
+                        <div>
+                            <form action="" @submit.prevent="onUpdate">
+                                <div class="form-group">
+                                    <label for="">Username</label>
+                                    <input type="text" v-model="edit_username" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="">Message</label>
+                                    <input type="text" v-model="edit_message" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-sm btn-outline-info">Update Message</button>
+                                </div>
+                            </form>
+                        </div>
+                        <b-button class="mt-3" variant="outline-danger" block @click="hideModal('edit-message-modal')">Done</b-button>
                     </b-modal>
                 </div>
             </div>
@@ -100,14 +122,17 @@
             data: {
                  username: '',
                  message: '',
-                 chat: {}
+                 chat: {},
+                 edit_id: '',
+                 edit_username: '',
+                 edit_message: ''
             },
             methods:{
-                showModal() {
-                    this.$refs['my-modal'].show()
+                showModal(id) {
+                    this.$refs[id].show()
                 },
-                hideModal() {
-                    this.$refs['my-modal'].hide()
+                hideModal(id) {
+                    this.$refs[id].hide()
                 },
                 onSubmit() {
                     if (this.username !== '' && this.message !== '') {
@@ -125,10 +150,11 @@
                             console.log(res.data.res)
                             if (res.data.res == 'success') {
                                 alert('Message added')
-                                this.username = ''
-                                this.message = ''
+                                this.username = '',
+                                this.message = '',
 
-                                app.hideModal()
+                                app.hideModal('new-message-modal'),
+                                app.getChatMessages()
                             }else {
                                 alert('...you forgot something. Try again.')
                             }
@@ -181,7 +207,56 @@
                     }
                 },
                 editMessage(id){
+                    var fd = new FormData()
 
+                    fd.append('id', id)
+                    axios({
+                        url:'edit_message.php',
+                        method: 'post',
+                        data: fd
+                    })
+                    .then(res => {
+                        if (res.data.res == 'success') {
+                            this.edit_id = res.data.row[0],
+                            this.edit_username = res.data.row[1],
+                            this.edit_message = res.data.row[2],
+                            app.showModal('edit-message-modal')
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })
+                },
+                onUpdate(){
+                    if (this.edit_username !== '' && this.edit_message !== '' && this.edit_id !== ''){
+                        var fd = new FormData()
+                        fd.append('id',  this.edit_id)
+                        fd.append('username',  this.edit_username)
+                        fd.append('message',  this.edit_message)
+
+                        axios({
+                            url: 'update_message.php',
+                            method: 'post',
+                            data: fd 
+                        })
+                        .then(res => {
+                            if(res.data.res == 'success'){
+                                alert('record update');
+
+                                this.edit_username = '';
+                                this.edit_message = '';
+                                this.edit_id = '';
+
+                                app.hideModal('edit-message-modal');
+                                this.getChatMessages(); 
+                            }
+                        })
+                        .catch(err => {
+                            console.log(err)
+                        })
+                    }else{
+                        alert('empty')
+                    }
                 }
             },
             mounted: function(){

@@ -45,5 +45,26 @@
                 return; 
             }
         }
+
+        public function edit($id){
+            $data = [];
+
+            $query = "SELECT * FROM anon_chat WHERE `id` = '$id'";
+            if ($sql = $this->conn->query($query)) {
+                $row = mysqli_fetch_row($sql);
+                $data = $row;
+            }
+            return $data;
+        }
+
+        public function update($id, $username, $message){
+            $query = "UPDATE anon_chat SET `username` = '$username', `message` = '$message' WHERE `id` = '$id'";
+
+            if($sql = $this->conn->query($query)){
+                return true;
+            }else{
+                return;
+            }
+        }
     }
 ?>
